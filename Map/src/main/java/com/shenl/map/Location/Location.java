@@ -6,7 +6,6 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.google.gson.Gson;
 import com.shenl.map.CallBack.LocationListener;
 
 import java.util.HashMap;
@@ -48,8 +47,7 @@ public class Location {
                     map.put("District",location.getDistrict());
                     map.put("Street",location.getStreet());
                     map.put("StreetNumber",location.getStreetNumber());
-                    String s = new Gson().toJson(map);
-                    listener.success(s);
+                    listener.success(map);
                 } else {
                     listener.error(getErrorStr(Code));
                 }

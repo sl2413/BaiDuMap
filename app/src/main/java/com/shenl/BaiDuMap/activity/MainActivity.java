@@ -10,6 +10,8 @@ import com.shenl.BaiDuMap.R;
 import com.shenl.map.CallBack.LocationListener;
 import com.shenl.map.Location.Location;
 
+import java.util.Map;
+
 public class MainActivity extends Activity {
 
     @Override
@@ -29,8 +31,8 @@ public class MainActivity extends Activity {
     public void getLocation(View v) {
         Location.getLocation(MainActivity.this, new LocationListener() {
             @Override
-            public void success(String s) {
-                Log.e("shenl",s);
+            public void success(Map<String, String> map) {
+                Log.e("shenl","定位成功");
             }
 
             @Override
