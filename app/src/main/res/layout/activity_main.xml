@@ -14,6 +14,11 @@
         android:layout_height="wrap_content"
         android:text="显示地图"
         android:onClick="ShowMap"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选择城市"
+        android:onClick="selCity"/>
 
 
 </LinearLayout>

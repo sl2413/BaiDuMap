@@ -53,4 +53,16 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(MainActivity.this,MapActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * TODO 功能：自行选择城市
+     *
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/24
+     */
+    public void selCity(View view){
+        Intent intent = new Intent(MainActivity.this,CityActivity.class);
+        startActivity(intent);
+    }
 }
