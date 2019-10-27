@@ -2,7 +2,6 @@ package com.shenl.map.application;
 
 import android.app.Application;
 import android.support.annotation.NonNull;
-
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 

@@ -39,14 +39,14 @@ public class Location {
                 int Code = location.getLocType();
                 if (61 == Code || 161 == Code || 65 == Code || 66 == Code) {
                     Map<String, String> map = new HashMap<String, String>();
-                    map.put("Longitude",location.getLongitude()+"");
-                    map.put("Latitude",location.getLatitude()+"");
-                    map.put("AddrStr",location.getAddrStr());
-                    map.put("Province",location.getProvince());
-                    map.put("City",location.getCity());
-                    map.put("District",location.getDistrict());
-                    map.put("Street",location.getStreet());
-                    map.put("StreetNumber",location.getStreetNumber());
+                    map.put("Longitude",location.getLongitude()+"");//经度
+                    map.put("Latitude",location.getLatitude()+"");//纬度
+                    map.put("AddrStr",location.getAddrStr());//整体地址
+                    map.put("Province",location.getProvince());//省
+                    map.put("City",location.getCity());//市
+                    map.put("District",location.getDistrict());//地区
+                    map.put("Street",location.getStreet());//街道
+                    map.put("StreetNumber",location.getStreetNumber());//门牌
                     listener.success(map);
                 } else {
                     listener.error(getErrorStr(Code));
