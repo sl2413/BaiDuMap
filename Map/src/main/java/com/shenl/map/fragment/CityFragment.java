@@ -73,7 +73,7 @@ public class CityFragment extends Fragment {
             @Override
             public void success(Map<String, String> map) {
                 String city = map.get("City");
-                Log.e("shenl", city);
+                //Log.e("shenl", city);
                 AddressDao.getAddressForName(getActivity(), city, new AddressDao.CallBack() {
                     @Override
                     public void Finish(List<AddressDao.Bean> list) {
