@@ -15,6 +15,12 @@
         android:textColor="#fff"
         android:textSize="18sp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="getAddress"
+        android:text="获取选择的内容"/>
+
     <RelativeLayout
         android:id="@+id/rl_CityContent"
         android:layout_width="match_parent"

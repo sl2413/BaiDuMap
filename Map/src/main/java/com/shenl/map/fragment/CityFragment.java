@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.shenl.map.CallBack.LocationListener;
+import com.shenl.map.Location.Location;
 import com.shenl.map.R;
 import com.shenl.map.dao.AddressDao;
 
@@ -20,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 
 public class CityFragment extends Fragment {
@@ -27,14 +31,19 @@ public class CityFragment extends Fragment {
     private ListView lv_province;
     private ListView lv_city;
     private ListView lv_area;
-    private String address = "";
+    private String allAddress = "";
     private List<AddressDao.Bean> provinceList;
     private List<AddressDao.Bean> cityList;
     private List<AddressDao.Bean> areaList;
+    private String provinceName = "";
+    private String cityName = "";
+    private String areaName = "";
+    private String provinceCode = "";
+    private String cityCode = "";
+    private String areaCode = "";
     private TextView tv_address;
     private MyAdapter cityAdapter;
     private MyAdapter areaAdapter;
-    private String CityCode = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,26 +68,47 @@ public class CityFragment extends Fragment {
     }
 
     private void initData() {
-        //查询省级数据
-        AddressDao.getAddress(getActivity(), "0", new AddressDao.CallBack() {
+        //联网自动获取定位地址
+        Location.getLocation(getActivity(), new LocationListener() {
             @Override
-            public void Finish(List<AddressDao.Bean> list) {
-                provinceList = list;
-                lv_province.setAdapter(new MyAdapter(provinceList));
-                //查询市级数据
-                AddressDao.getAddress(getActivity(), provinceList.get(0).getRegionCode(), new AddressDao.CallBack() {
+            public void success(Map<String, String> map) {
+                String city = map.get("City");
+                Log.e("shenl",city);
+                AddressDao.getAddressForName(getActivity(), city, new AddressDao.CallBack() {
                     @Override
                     public void Finish(List<AddressDao.Bean> list) {
-                        cityList = list;
-                        cityAdapter = new MyAdapter(cityList);
-                        lv_city.setAdapter(cityAdapter);
-                        //查询县级数据
-                        AddressDao.getAddress(getActivity(), cityList.get(0).getRegionCode(), new AddressDao.CallBack() {
+                        Log.e("shenl","~~~"+list.get(0).getDistrictName());
+                        Log.e("shenl","~~~"+list.get(0).getRegionCode());
+                        cityName = list.get(0).getDistrictName();
+                        cityCode = list.get(0).getRegionCode();
+                    }
+                });
+            }
+
+            @Override
+            public void error(String error) {
+                //查询省级数据
+                AddressDao.getAddressForCode(getActivity(), "0", new AddressDao.CallBack() {
+                    @Override
+                    public void Finish(List<AddressDao.Bean> list) {
+                        provinceList = list;
+                        lv_province.setAdapter(new MyAdapter(provinceList));
+                        //查询市级数据
+                        AddressDao.getAddressForCode(getActivity(), provinceList.get(0).getRegionCode(), new AddressDao.CallBack() {
                             @Override
                             public void Finish(List<AddressDao.Bean> list) {
-                                areaList = list;
-                                areaAdapter = new MyAdapter(areaList);
-                                lv_area.setAdapter(areaAdapter);
+                                cityList = list;
+                                cityAdapter = new MyAdapter(cityList);
+                                lv_city.setAdapter(cityAdapter);
+                                //查询县级数据
+                                AddressDao.getAddressForCode(getActivity(), cityList.get(0).getRegionCode(), new AddressDao.CallBack() {
+                                    @Override
+                                    public void Finish(List<AddressDao.Bean> list) {
+                                        areaList = list;
+                                        areaAdapter = new MyAdapter(areaList);
+                                        lv_area.setAdapter(areaAdapter);
+                                    }
+                                });
                             }
                         });
                     }
@@ -92,17 +122,18 @@ public class CityFragment extends Fragment {
         lv_province.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                address += provinceList.get(position).getDistrictName();
-                CityCode = provinceList.get(position).getRegionCode();
+                allAddress += provinceList.get(position).getDistrictName();
+                provinceName = provinceList.get(position).getDistrictName();
+                provinceCode = provinceList.get(position).getRegionCode();
                 //查询市级数据
-                AddressDao.getAddress(getActivity(), provinceList.get(position).getRegionCode(), new AddressDao.CallBack() {
+                AddressDao.getAddressForCode(getActivity(), provinceList.get(position).getRegionCode(), new AddressDao.CallBack() {
                     @Override
                     public void Finish(List<AddressDao.Bean> list) {
                         cityList.clear();
                         cityList.addAll(list);
                         cityAdapter.notifyDataSetChanged();
                         //查询县级数据
-                        AddressDao.getAddress(getActivity(), cityList.get(0).getRegionCode(), new AddressDao.CallBack() {
+                        AddressDao.getAddressForCode(getActivity(), cityList.get(0).getRegionCode(), new AddressDao.CallBack() {
                             @Override
                             public void Finish(List<AddressDao.Bean> list) {
                                 areaList.clear();
@@ -118,10 +149,11 @@ public class CityFragment extends Fragment {
         lv_city.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                address += cityList.get(position).getDistrictName();
-                CityCode = cityList.get(position).getRegionCode();
+                allAddress += cityList.get(position).getDistrictName();
+                cityName = cityList.get(position).getDistrictName();
+                cityCode = cityList.get(position).getRegionCode();
                 //查询县级数据
-                AddressDao.getAddress(getActivity(), cityList.get(position).getRegionCode(), new AddressDao.CallBack() {
+                AddressDao.getAddressForCode(getActivity(), cityList.get(position).getRegionCode(), new AddressDao.CallBack() {
                     @Override
                     public void Finish(List<AddressDao.Bean> list) {
                         areaList.clear();
@@ -135,8 +167,9 @@ public class CityFragment extends Fragment {
         lv_area.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                address += areaList.get(position).getDistrictName();
-                CityCode = areaList.get(position).getRegionCode();
+                allAddress += areaList.get(position).getDistrictName();
+                areaName = areaList.get(position).getDistrictName();
+                areaCode = areaList.get(position).getRegionCode();
             }
         });
     }
@@ -182,15 +215,82 @@ public class CityFragment extends Fragment {
         }
     }
 
+
     /**
-     * TODO 功能：获取选中的行政区划码
-     *
+     * TODO 功能：获取　省+市+县(区)
+     * <p>
      * 参数说明:
      * 作    者:   沈  亮
-     * 创建时间:   2019/10/25
+     * 创建时间:   2019/10/26
      */
-    public String getCityCode(){
-        return CityCode;
+    public String getAllAddress() {
+        return allAddress;
+    }
+
+    /**
+     * TODO 功能：获取省级名称
+     * <p>
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/26
+     */
+    public String getProvinceName() {
+        return provinceName;
+    }
+
+    /**
+     * TODO 功能：获取省级编码
+     * <p>
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/26
+     */
+    public String getProvinceCode() {
+        return provinceCode;
+    }
+
+    /**
+     * TODO 功能：获取市级名称
+     * <p>
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/26
+     */
+    public String getCityName() {
+        return cityName;
+    }
+
+    /**
+     * TODO 功能：获取市级编码
+     * <p>
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/26
+     */
+    public String getCityCode() {
+        return cityCode;
+    }
+
+    /**
+     * TODO 功能：获取县(区)级名称
+     * <p>
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/26
+     */
+    public String getAreaName() {
+        return areaName;
+    }
+
+    /**
+     * TODO 功能：获取县(区)级编码
+     * <p>
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/26
+     */
+    public String getAreaCode() {
+        return areaCode;
     }
 
     /**
