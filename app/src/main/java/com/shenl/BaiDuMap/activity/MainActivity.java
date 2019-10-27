@@ -32,7 +32,8 @@ public class MainActivity extends Activity {
         Location.getLocation(MainActivity.this, new LocationListener() {
             @Override
             public void success(Map<String, String> map) {
-                Log.e("shenl","定位成功");
+                String addrStr = map.get("AddrStr");
+                Log.e("shenl",addrStr);
             }
 
             @Override
@@ -51,6 +52,18 @@ public class MainActivity extends Activity {
      */
     public void ShowMap(View v){
         Intent intent = new Intent(MainActivity.this,MapActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * TODO 功能：自行选择城市
+     *
+     * 参数说明:
+     * 作    者:   沈  亮
+     * 创建时间:   2019/10/24
+     */
+    public void selCity(View view){
+        Intent intent = new Intent(MainActivity.this,CityActivity.class);
         startActivity(intent);
     }
 }
